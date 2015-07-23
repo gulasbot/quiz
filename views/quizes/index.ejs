@@ -1,5 +1,11 @@
-pepe
-<%console.dir(quizes);%>
+<form method="get" action="/quizes">
+  <div class="search">
+    <label>Búsqueda de preguntas</label>
+    <input type="text" name="search" />
+    <input type="submit" value="Buscar" />
+  <div>
+</form>
+<br/>
 <table>
   <% var i; for (i=0; i < quizes.length; i++) { %>
     <tr>
