@@ -2,6 +2,9 @@ var path = require('path');
 
 // Postgres DATABASE_URL = postgres://user:passwd@host:port/database
 // SQLite   DATABASE_URL = sqlite://:@:/
+console.info(process.env.DATABASE_URL);
+if(process.env.DATABASE_URL === undefined)
+  process.env.DATABASE_URL='sqlite://:@:/';
 var url = process.env.DATABASE_URL.match(/(.*)\:\/\/(.*?)\:(.*)@(.*)\:(.*)\/(.*)/);
 var DB_name  = (url[6]||null);
 var user     = (url[2]||null);
@@ -26,23 +29,34 @@ var sequelize = new Sequelize(DB_name, user, pwd,
   }
 );
 
-//console.dir(sequelize);
-
 // Importar definicion de la tabla Quiz
 var quiz_path = path.join(__dirname,'quiz');
 var Quiz = sequelize.import(quiz_path);
 
+// Importar definicion de la tabla Comment
+var comment_path = path.join(__dirname,'comment');
+var Comment = sequelize.import(comment_path);
+
+Comment.belongsTo(Quiz);
+Quiz.hasMany(Comment);
+
 // exportar tablas
 exports.Quiz = Quiz;
+exports.Comment = Comment;
 
-// sequelize.sync() inicializa tabla de preguntas en DB
-sequelize.sync().then(function() {
-
-  Quiz.destroy({
-      truncate: true /* this will ignore where and truncate the table instead */
-    }).then(function (count){
-		    Quiz.create( {	pregunta: 'Capital de Italia',respuesta: 'Roma', tema: 'humanidades'});
-        Quiz.create( {	pregunta: 'Capital de Portugal', respuesta: 'Lisboa', tema: 'humanidades'})
-		                  .then(function(){console.log('Base de datos inicializada')});
+//sequelize.sync() crea e inicializa tabla de preguntas en BD
+sequelize.sync().then(function(){
+	Quiz.count().then(function (count) {
+		if(count === 0) {
+			Quiz.create({pregunta: 'Capital de Italia',
+				     respuesta: 'Roma',
+				     tema: 'humanidades'
+				    });
+			Quiz.create({pregunta: 'Capital de Portugal',
+				     respuesta: 'Lisboa',
+				     tema: 'ocio'
+				    })
+			.then(function(){console.log('Base de datos inicializada')});
+		};
 	});
 });
