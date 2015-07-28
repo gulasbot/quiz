@@ -22,7 +22,7 @@
       var d = new Date(  session.user.lastTimeAccess);
       %>
 			<span class="right"><%=session.user.username%> <a href="/logout">Logout</a></span></br>
-      <span class="right" >Ultima actividad: <%=d.getDate()+ "/" + (d.getMonth() + 1)+ "/"+ d.getFullYear()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()%></span>
+      <span class="right" >Ultima actividad: <%=d.getDate()+ "/" + (d.getMonth() + 1)+ "/"+ d.getFullYear()+" "+d.getHours()+":"+(d.getMinutes()<10?'0':'') + d.getMinutes()+":"+d.getSeconds()%></span>
 		<%}%>
     <h2>Quiz<span>: el juego de las preguntas</span></h2>
   </header>
