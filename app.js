@@ -25,9 +25,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser('Quiz 2015'));
 app.use(session());
+app.use(session({ secret: 'Quiz 2015', resave: true, saveUninitialized: true })); //Evitarmos el warning deprecated
 
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Helpers dinamicos:
 app.use(function(req, res, next) {
@@ -44,6 +46,28 @@ app.use(function(req, res, next) {
   // Hacer visible req.session en las vistas
   res.locals.session = req.session;
   next();
+});
+
+//MW para comprobar si el tiempo de inactividad del usuario es mayor de 2 minutos. En tal caso, borramos la session
+app.use(function(req, res, next){
+    var timeout = 2 * 60 * 1000;
+    var now = (new Date()).getTime();
+
+    console.info('checking usuario');
+    if(req.session.user){
+        if(now >(req.session.user.lastTimeAccess + timeout)){
+          console.info('borrando session');
+            //Se ha superado el tiempo de limite de inactividad, destruimos la session
+            delete req.session.user;
+        } else {
+            //Actualizo hora ultimo acceso
+            console.info('actualizando timeout');
+            req.session.user.lastTimeAccess = now;
+        }
+    } else {
+      console.info('Sin sesion');
+    }
+    next();
 });
 
 app.use('/', routes);

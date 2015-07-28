@@ -11,7 +11,6 @@
         type='text/css'
         media='only screen and (max-width: 480px)'
         href='/stylesheets/smartphone.css' />
-
 </head>
 
 <body>
@@ -19,8 +18,11 @@
   <header class="main" id="h1">
     <%if(!session.user){%>
 			<span class="right"><a href="/login">Login</a></span>
-		<%}else{%>
-			<span class="right"><%=session.user.username%> <a href="/logout">Logout</a></span>
+		<%}else{
+      var d = new Date(  session.user.lastTimeAccess);
+      %>
+			<span class="right"><%=session.user.username%> <a href="/logout">Logout</a></span></br>
+      <span class="right" >Ultima actividad: <%=d.getDate()+ "/" + (d.getMonth() + 1)+ "/"+ d.getFullYear()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()%></span>
 		<%}%>
     <h2>Quiz<span>: el juego de las preguntas</span></h2>
   </header>
